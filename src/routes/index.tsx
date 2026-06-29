@@ -212,12 +212,16 @@ function Index() {
               Book a 20-minute call with a member of the desk. No obligation, just a straight conversation about what you hold and how a sale would work.
             </p>
             <div
-              className="flex h-[300px] items-center justify-center border border-[var(--line-on-dark)] bg-[var(--tvg-ink-700)] text-center"
+              className="overflow-hidden border border-[var(--line-on-dark)] bg-[var(--surface-raised)]"
               style={{ borderRadius: "var(--radius-md)" }}
             >
-              <span className="font-display text-[13px] uppercase tracking-[0.06em] text-[var(--text-inverse-muted)]">
-                Scheduler embed (Calendly / Cal.com)
-              </span>
+              <iframe
+                src="https://calendly.com/henry-mkta/introduction?hide_gdpr_banner=1&background_color=f0ede8&text_color=111218&primary_color=c49a5c"
+                title="Book a 20-minute introduction call"
+                className="w-full"
+                style={{ height: 720, border: 0 }}
+                loading="lazy"
+              />
             </div>
             <p className="mt-6 text-[15px] text-[var(--text-inverse-muted)]">
               Or email <strong className="text-[var(--text-inverse)]">info@tessvanghert.com</strong>
