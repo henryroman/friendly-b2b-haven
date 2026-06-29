@@ -10,7 +10,6 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { LoadingScreen } from "@/components/site/LoadingScreen";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
@@ -79,10 +78,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Tess Van Ghert — We buy precious metal from companies" },
       { name: "description", content: "Compliant acquisition. Global settlement. A family-owned precious metals trading house since 2011." },
       { name: "author", content: "Tess Van Ghert" },
-      { property: "og:title", content: "Tess Van Ghert — Precious Metal Trading" },
-      { property: "og:description", content: "We buy precious metal from companies. Compliant · Global settlement · FCA/EXW." },
+      { property: "og:title", content: "Tess Van Ghert — We buy precious metal from companies" },
+      { property: "og:description", content: "Compliant acquisition. Global settlement. A family-owned precious metals trading house since 2011." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "Tess Van Ghert — We buy precious metal from companies" },
+      { name: "twitter:description", content: "Compliant acquisition. Global settlement. A family-owned precious metals trading house since 2011." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/fdc9fd59-bd7a-4469-a179-1a6bc716a896/id-preview-a0591492--0be0552f-1fac-45af-919e-d090a3db8ce2.lovable.app-1782733438594.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/fdc9fd59-bd7a-4469-a179-1a6bc716a896/id-preview-a0591492--0be0552f-1fac-45af-919e-d090a3db8ce2.lovable.app-1782733438594.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -118,7 +121,6 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
-      <LoadingScreen />
       <Outlet />
     </QueryClientProvider>
   );
