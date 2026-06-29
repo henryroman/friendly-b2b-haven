@@ -1,4 +1,4 @@
-import logo from "@/assets/tvg-primary.png.asset.json";
+import logo from "@/assets/tvg-reversed.png.asset.json";
 
 export function Footer() {
   return (
