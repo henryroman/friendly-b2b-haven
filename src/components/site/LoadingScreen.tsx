@@ -13,8 +13,10 @@ export function LoadingScreen() {
   const [fade, setFade] = useState(false);
 
   useEffect(() => {
-    const fadeT = setTimeout(() => setFade(true), 1600);
-    const hideT = setTimeout(() => setInitial(false), 2200);
+    // Minimum loader time = one full pour cycle (3.6s) + small buffer so the
+    // animation always plays fully before fading out.
+    const fadeT = setTimeout(() => setFade(true), 3800);
+    const hideT = setTimeout(() => setInitial(false), 4400);
     return () => {
       clearTimeout(fadeT);
       clearTimeout(hideT);
