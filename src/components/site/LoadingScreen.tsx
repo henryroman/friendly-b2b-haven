@@ -13,8 +13,10 @@ export function LoadingScreen() {
   const [fade, setFade] = useState(false);
 
   useEffect(() => {
-    const fadeT = setTimeout(() => setFade(true), 1600);
-    const hideT = setTimeout(() => setInitial(false), 2200);
+    // Minimum loader time = one full pour cycle (3.6s) + small buffer so the
+    // animation always plays fully before fading out.
+    const fadeT = setTimeout(() => setFade(true), 3800);
+    const hideT = setTimeout(() => setInitial(false), 4400);
     return () => {
       clearTimeout(fadeT);
       clearTimeout(hideT);
@@ -74,9 +76,9 @@ export function LoadingScreen() {
           88%, 100% { transform: rotate(0deg); }
         }
         @keyframes tvgFill {
-          0%, 12%  { transform: translateY(100%); }
-          85%      { transform: translateY(0%); }
-          100%     { transform: translateY(0%); }
+          0%, 12%  { transform: translateY(64px); }
+          85%      { transform: translateY(0px); }
+          100%     { transform: translateY(0px); }
         }
         @keyframes tvgShimmer {
           0%   { transform: translateX(-100%); }
