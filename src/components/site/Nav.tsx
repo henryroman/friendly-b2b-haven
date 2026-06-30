@@ -18,7 +18,7 @@ export function Nav() {
     >
       <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-5 py-3 md:px-8 md:py-4">
         <Link to="/" className="shrink-0" onClick={() => setOpen(false)} aria-label="Tess Van Ghert — Home">
-          <img src={iconmark} alt="Tess Van Ghert" className="h-10 w-auto md:h-12" />
+          <img src={iconmark} alt="Tess Van Ghert" className="h-14 md:h-16 w-auto object-contain" />
         </Link>
 
         <nav className="hidden lg:block">
