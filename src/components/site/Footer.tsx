@@ -6,7 +6,13 @@ export function Footer() {
       <div className="mx-auto max-w-[1200px] px-5 md:px-8">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           <div>
-            <img src={logo} alt="Tess Van Ghert" className="h-14 md:h-18 w-auto object-contain" />
+            <div className="h-20 md:h-24 mb-5 flex items-center">
+  <img
+    src={logo}
+    className="h-full w-auto object-contain"
+    alt="Tess Van Ghert"
+  />
+</div>
             <p className="text-inverse-muted max-w-[34ch] text-[15px] leading-[1.6]">
               A family-owned physical precious metals trading house. Compliant acquisition and global settlement since 2011.
             </p>
