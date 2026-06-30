@@ -13,6 +13,7 @@ import { Route as InsightsRouteImport } from './routes/insights'
 import { Route as ComplianceRouteImport } from './routes/compliance'
 import { Route as AmlPolicyRouteImport } from './routes/aml-policy'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as GuidesCorporateLiquidationRouteImport } from './routes/guides.corporate-liquidation'
 
 const InsightsRoute = InsightsRouteImport.update({
   id: '/insights',
@@ -34,18 +35,26 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GuidesCorporateLiquidationRoute =
+  GuidesCorporateLiquidationRouteImport.update({
+    id: '/guides/corporate-liquidation',
+    path: '/guides/corporate-liquidation',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/aml-policy': typeof AmlPolicyRoute
   '/compliance': typeof ComplianceRoute
   '/insights': typeof InsightsRoute
+  '/guides/corporate-liquidation': typeof GuidesCorporateLiquidationRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/aml-policy': typeof AmlPolicyRoute
   '/compliance': typeof ComplianceRoute
   '/insights': typeof InsightsRoute
+  '/guides/corporate-liquidation': typeof GuidesCorporateLiquidationRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +62,30 @@ export interface FileRoutesById {
   '/aml-policy': typeof AmlPolicyRoute
   '/compliance': typeof ComplianceRoute
   '/insights': typeof InsightsRoute
+  '/guides/corporate-liquidation': typeof GuidesCorporateLiquidationRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/aml-policy' | '/compliance' | '/insights'
+  fullPaths:
+    | '/'
+    | '/aml-policy'
+    | '/compliance'
+    | '/insights'
+    | '/guides/corporate-liquidation'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/aml-policy' | '/compliance' | '/insights'
-  id: '__root__' | '/' | '/aml-policy' | '/compliance' | '/insights'
+  to:
+    | '/'
+    | '/aml-policy'
+    | '/compliance'
+    | '/insights'
+    | '/guides/corporate-liquidation'
+  id:
+    | '__root__'
+    | '/'
+    | '/aml-policy'
+    | '/compliance'
+    | '/insights'
+    | '/guides/corporate-liquidation'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +93,7 @@ export interface RootRouteChildren {
   AmlPolicyRoute: typeof AmlPolicyRoute
   ComplianceRoute: typeof ComplianceRoute
   InsightsRoute: typeof InsightsRoute
+  GuidesCorporateLiquidationRoute: typeof GuidesCorporateLiquidationRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -99,6 +126,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/guides/corporate-liquidation': {
+      id: '/guides/corporate-liquidation'
+      path: '/guides/corporate-liquidation'
+      fullPath: '/guides/corporate-liquidation'
+      preLoaderRoute: typeof GuidesCorporateLiquidationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -107,6 +141,7 @@ const rootRouteChildren: RootRouteChildren = {
   AmlPolicyRoute: AmlPolicyRoute,
   ComplianceRoute: ComplianceRoute,
   InsightsRoute: InsightsRoute,
+  GuidesCorporateLiquidationRoute: GuidesCorporateLiquidationRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
