@@ -76,9 +76,9 @@ export function LoadingScreen() {
           88%, 100% { transform: rotate(0deg); }
         }
         @keyframes tvgFill {
-          0%, 12%  { transform: translateY(100%); }
-          85%      { transform: translateY(0%); }
-          100%     { transform: translateY(0%); }
+          0%, 12%  { transform: translateY(64px); }
+          85%      { transform: translateY(0px); }
+          100%     { transform: translateY(0px); }
         }
         @keyframes tvgShimmer {
           0%   { transform: translateX(-100%); }
