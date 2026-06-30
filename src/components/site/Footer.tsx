@@ -1,4 +1,4 @@
-import logo from "@/assets/tvg-reversed.png.asset.json";
+import logo from "@/assets/tvg-reversed.png";
 
 export function Footer() {
   return (
@@ -6,7 +6,7 @@ export function Footer() {
       <div className="mx-auto max-w-[1200px] px-5 md:px-8">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           <div>
-            <img src={logo.url} alt="Tess Van Ghert" className="mb-5 h-12 w-auto" />
+            <img src={logo} alt="Tess Van Ghert" className="mb-5 h-12 w-auto" />
             <p className="text-inverse-muted max-w-[34ch] text-[15px] leading-[1.6]">
               A family-owned physical precious metals trading house. Compliant acquisition and global settlement since 2011.
             </p>

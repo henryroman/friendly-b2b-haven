@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import iconmark from "@/assets/tvg-iconmark-reversed.png.asset.json";
+import iconmark from "@/assets/tvg-iconmark-reversed.png";
 
 const links = [
   { to: "/", label: "Home" },
@@ -18,7 +18,7 @@ export function Nav() {
     >
       <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-5 py-3 md:px-8 md:py-4">
         <Link to="/" className="shrink-0" onClick={() => setOpen(false)} aria-label="Tess Van Ghert — Home">
-          <img src={iconmark.url} alt="Tess Van Ghert" className="h-10 w-auto md:h-12" />
+          <img src={iconmark} alt="Tess Van Ghert" className="h-10 w-auto md:h-12" />
         </Link>
 
         <nav className="hidden lg:block">
