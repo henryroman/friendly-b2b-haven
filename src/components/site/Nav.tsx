@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import iconmark from "@/assets/tvg-iconmark-reversed.png";
+import iconmark from "@/assets/iconMarkReversed.png";
 
 const links = [
   { to: "/", label: "Home" },
