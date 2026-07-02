@@ -10,7 +10,9 @@ export const Route = createFileRoute("/aml-policy")({
       { name: "description", content: "Our anti-money-laundering policy: risk-based assessment, customer due diligence, ongoing monitoring, record keeping, and reporting." },
       { property: "og:title", content: "AML Policy — Tess Van Ghert" },
       { property: "og:description", content: "Policy summary: risk-based AML/CFT framework operated by Tess Van Ghert." },
+      { property: "og:url", content: "https://tvg.gold/aml-policy" },
     ],
+    links: [{ rel: "canonical", href: "https://tvg.gold/aml-policy" }],
   }),
   component: AmlPage,
 });

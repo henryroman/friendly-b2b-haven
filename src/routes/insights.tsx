@@ -10,7 +10,9 @@ export const Route = createFileRoute("/insights")({
       { name: "description", content: "Notes from the desk on precious metals trading, compliance, and global settlement." },
       { property: "og:title", content: "Insights — Tess Van Ghert" },
       { property: "og:description", content: "Notes from the desk: trading, compliance, settlement." },
+      { property: "og:url", content: "https://tvg.gold/insights" },
     ],
+    links: [{ rel: "canonical", href: "https://tvg.gold/insights" }],
   }),
   component: InsightsPage,
 });

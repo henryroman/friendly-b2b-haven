@@ -18,11 +18,11 @@ export const Route = createFileRoute("/guides/corporate-liquidation")({
         content:
           "Risk-mitigated, audit-trail-first guide to liquidating corporate precious metal holdings. For treasury, finance, and insolvency teams.",
       },
-      { property: "og:url", content: "https://friendly-b2b-haven.lovable.app/guides/corporate-liquidation" },
+      { property: "og:url", content: "https://tvg.gold/guides/corporate-liquidation" },
       { property: "og:type", content: "article" },
     ],
     links: [
-      { rel: "canonical", href: "https://friendly-b2b-haven.lovable.app/guides/corporate-liquidation" },
+      { rel: "canonical", href: "https://tvg.gold/guides/corporate-liquidation" },
     ],
     scripts: [
       {
@@ -35,7 +35,7 @@ export const Route = createFileRoute("/guides/corporate-liquidation")({
             "A practical B2B guide to selling precious metals at scale: valuation, documented source of goods, chain of custody, AML/KYB, and settlement.",
           author: { "@type": "Organization", name: "Tess Van Ghert" },
           publisher: { "@type": "Organization", name: "Tess Van Ghert" },
-          mainEntityOfPage: "https://friendly-b2b-haven.lovable.app/guides/corporate-liquidation",
+          mainEntityOfPage: "https://tvg.gold/guides/corporate-liquidation",
         }),
       },
     ],
