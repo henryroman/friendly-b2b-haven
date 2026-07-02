@@ -10,7 +10,9 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Compliant acquisition. Global settlement. We price at the LBMA benchmark, manage every step from collection to refining, and wire the funds." },
       { property: "og:title", content: "Tess Van Ghert — Precious Metal Trading" },
       { property: "og:description", content: "We buy precious metal from companies. Compliant · Global settlement · FCA/EXW." },
+      { property: "og:url", content: "https://tvg.gold/" },
     ],
+    links: [{ rel: "canonical", href: "https://tvg.gold/" }],
   }),
   component: Index,
 });

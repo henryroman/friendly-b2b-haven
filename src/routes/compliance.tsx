@@ -10,7 +10,9 @@ export const Route = createFileRoute("/compliance")({
       { name: "description", content: "KYC, KYB, sanctions screening, documented source of goods, and LBMA-accredited settlement. The infrastructure that lets a finance team sell metal without taking on risk." },
       { property: "og:title", content: "Compliance — Tess Van Ghert" },
       { property: "og:description", content: "How we keep the audit trail clean: KYC, KYB, sanctions and PEP screening, chain of custody, LBMA settlement." },
+      { property: "og:url", content: "https://tvg.gold/compliance" },
     ],
+    links: [{ rel: "canonical", href: "https://tvg.gold/compliance" }],
   }),
   component: CompliancePage,
 });
