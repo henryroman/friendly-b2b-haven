@@ -9,12 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as InsightsRouteImport } from './routes/insights'
 import { Route as ComplianceRouteImport } from './routes/compliance'
 import { Route as AmlPolicyRouteImport } from './routes/aml-policy'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as GuidesCorporateLiquidationRouteImport } from './routes/guides.corporate-liquidation'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InsightsRoute = InsightsRouteImport.update({
   id: '/insights',
   path: '/insights',
@@ -47,6 +53,7 @@ export interface FileRoutesByFullPath {
   '/aml-policy': typeof AmlPolicyRoute
   '/compliance': typeof ComplianceRoute
   '/insights': typeof InsightsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/guides/corporate-liquidation': typeof GuidesCorporateLiquidationRoute
 }
 export interface FileRoutesByTo {
@@ -54,6 +61,7 @@ export interface FileRoutesByTo {
   '/aml-policy': typeof AmlPolicyRoute
   '/compliance': typeof ComplianceRoute
   '/insights': typeof InsightsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/guides/corporate-liquidation': typeof GuidesCorporateLiquidationRoute
 }
 export interface FileRoutesById {
@@ -62,6 +70,7 @@ export interface FileRoutesById {
   '/aml-policy': typeof AmlPolicyRoute
   '/compliance': typeof ComplianceRoute
   '/insights': typeof InsightsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/guides/corporate-liquidation': typeof GuidesCorporateLiquidationRoute
 }
 export interface FileRouteTypes {
@@ -71,6 +80,7 @@ export interface FileRouteTypes {
     | '/aml-policy'
     | '/compliance'
     | '/insights'
+    | '/sitemap.xml'
     | '/guides/corporate-liquidation'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -78,6 +88,7 @@ export interface FileRouteTypes {
     | '/aml-policy'
     | '/compliance'
     | '/insights'
+    | '/sitemap.xml'
     | '/guides/corporate-liquidation'
   id:
     | '__root__'
@@ -85,6 +96,7 @@ export interface FileRouteTypes {
     | '/aml-policy'
     | '/compliance'
     | '/insights'
+    | '/sitemap.xml'
     | '/guides/corporate-liquidation'
   fileRoutesById: FileRoutesById
 }
@@ -93,11 +105,19 @@ export interface RootRouteChildren {
   AmlPolicyRoute: typeof AmlPolicyRoute
   ComplianceRoute: typeof ComplianceRoute
   InsightsRoute: typeof InsightsRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   GuidesCorporateLiquidationRoute: typeof GuidesCorporateLiquidationRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/insights': {
       id: '/insights'
       path: '/insights'
@@ -141,6 +161,7 @@ const rootRouteChildren: RootRouteChildren = {
   AmlPolicyRoute: AmlPolicyRoute,
   ComplianceRoute: ComplianceRoute,
   InsightsRoute: InsightsRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   GuidesCorporateLiquidationRoute: GuidesCorporateLiquidationRoute,
 }
 export const routeTree = rootRouteImport
