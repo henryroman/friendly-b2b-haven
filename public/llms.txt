@@ -1,0 +1,11 @@
+# Tess Van Ghert
+
+> We buy precious metal from companies. Compliant acquisition, global settlement, LBMA benchmark pricing, and full audit trail since 2011.
+
+## Pages
+
+- [Home](/): Introduction to Tess Van Ghert's precious metals trading services for corporates, treasury teams, insolvency practitioners, and industrial manufacturers.
+- [Compliance](/compliance): KYC, KYB, sanctions and PEP screening, documented source of goods, chain of custody, and LBMA-accredited settlement framework.
+- [AML Policy](/aml-policy): Anti-money-laundering and counter-terrorist financing policy summary: risk-based approach, CDD, record keeping, and governance.
+- [Insights](/insights): Practical notes from the desk on precious metals trading, compliance, and global settlement.
+- [Corporate Liquidation Guide](/guides/corporate-liquidation): A B2B guide to selling precious metals at scale — valuation, documented source of goods, logistics, and settlement for treasury and insolvency teams.
