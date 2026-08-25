@@ -1,10 +1,14 @@
+import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { Section, RuleGold, Overline, Btn, Chip } from "@/components/site/Section";
+import { MeltCalculator } from "@/components/site/MeltCalculator";
+import { fetchLiveMeltPrices } from "@/lib/metals-price";
 import { pageMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/")({
+  loader: () => fetchLiveMeltPrices(),
   head: () =>
     pageMeta({
       title: "Tess Van Ghert — We buy precious metal from companies",
@@ -39,6 +43,23 @@ const steps = [
 ];
 
 function Index() {
+  const livePrices = Route.useLoaderData();
+
+  // Preselect the enquiry form's metal field from ?metal= (set by the
+  // calculator's "Get a firm offer" button below) -- same mechanism
+  // metauxprecieux.org's EnquiryForm already uses for its own calculator.
+  // ?note= (2026-08-25, added when the calculator gained "Add to list")
+  // prefills the free-text "Anything else" field with a list summary.
+  const [metalType, setMetalType] = useState("");
+  const [note, setNote] = useState("");
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const m = params.get("metal");
+    const n = params.get("note");
+    if (m) setMetalType(m);
+    if (n) setNote(n);
+  }, []);
+
   return (
     <>
       <Nav />
@@ -169,6 +190,12 @@ function Index() {
         </div>
       </Section>
 
+      {/* MELT VALUE CALCULATOR */}
+      <hr className="mx-auto h-px max-w-[1200px] border-0 bg-[var(--line-hairline)]" />
+      <Section id="calculator">
+        <MeltCalculator livePrices={livePrices} />
+      </Section>
+
       {/* ENQUIRE / BOOK A CALL */}
       <Section id="enquire" dark>
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
@@ -193,11 +220,21 @@ function Index() {
                 <Field label="Phone" type="tel" placeholder="+44 …" />
               </div>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                <FieldSelect label="Metal type" options={["Gold", "Silver", "Platinum group", "Mixed / not sure"]} />
+                <FieldSelect
+                  label="Metal type"
+                  options={["Gold", "Silver", "Platinum group", "Mixed / not sure"]}
+                  value={metalType}
+                  onChange={setMetalType}
+                />
                 <Field label="Estimated quantity" placeholder="e.g. 40 kg, or unknown" />
               </div>
               <Field label="Location of the metal" placeholder="City, country" />
-              <FieldTextarea label="Anything else" placeholder="Form of the metal, timing, context…" />
+              <FieldTextarea
+                label="Anything else"
+                placeholder="Form of the metal, timing, context…"
+                value={note}
+                onChange={setNote}
+              />
               <Btn type="submit" variant="primary" className="self-start">Submit enquiry</Btn>
               <p className="text-[13px] text-[var(--text-inverse-muted)]">
                 Submitting does not create a contract. All enquiries handled in confidence.
@@ -253,7 +290,17 @@ function Field({ label, type = "text", placeholder }: { label: string; type?: st
   );
 }
 
-function FieldSelect({ label, options }: { label: string; options: string[] }) {
+function FieldSelect({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  options: string[];
+  value?: string;
+  onChange?: (value: string) => void;
+}) {
   return (
     <div className="flex flex-col gap-1.5">
       <label className="font-display text-[12px] uppercase text-[var(--text-inverse-muted)]" style={{ letterSpacing: "var(--tracking-overline)" }}>
@@ -262,6 +309,8 @@ function FieldSelect({ label, options }: { label: string; options: string[] }) {
       <select
         className="w-full border-0 border-b border-[var(--line-on-dark)] bg-transparent py-2 text-[17px] text-[var(--text-inverse)] outline-none transition-colors focus:border-[var(--accent)]"
         style={{ fontFamily: "var(--font-body)" }}
+        value={value}
+        onChange={onChange ? (e) => onChange(e.target.value) : undefined}
       >
         {options.map((o) => (
           <option key={o} value={o} className="bg-[var(--tvg-ink-700)] text-[var(--text-inverse)]">{o}</option>
@@ -271,7 +320,17 @@ function FieldSelect({ label, options }: { label: string; options: string[] }) {
   );
 }
 
-function FieldTextarea({ label, placeholder }: { label: string; placeholder?: string }) {
+function FieldTextarea({
+  label,
+  placeholder,
+  value,
+  onChange,
+}: {
+  label: string;
+  placeholder?: string;
+  value?: string;
+  onChange?: (value: string) => void;
+}) {
   return (
     <div className="flex flex-col gap-1.5">
       <label className="font-display text-[12px] uppercase text-[var(--text-inverse-muted)]" style={{ letterSpacing: "var(--tracking-overline)" }}>
@@ -281,6 +340,8 @@ function FieldTextarea({ label, placeholder }: { label: string; placeholder?: st
         placeholder={placeholder}
         className="min-h-[80px] w-full resize-y border-0 border-b border-[var(--line-on-dark)] bg-transparent py-2 text-[17px] text-[var(--text-inverse)] outline-none transition-colors placeholder:text-[var(--text-inverse-muted)] focus:border-[var(--accent)]"
         style={{ fontFamily: "var(--font-body)" }}
+        value={value}
+        onChange={onChange ? (e) => onChange(e.target.value) : undefined}
       />
     </div>
   );

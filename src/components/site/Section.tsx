@@ -48,6 +48,8 @@ export function Btn({
   dark = false,
   type,
   className = "",
+  onClick,
+  disabled = false,
 }: {
   href?: string;
   variant?: "primary" | "secondary";
@@ -55,6 +57,11 @@ export function Btn({
   dark?: boolean;
   type?: "button" | "submit";
   className?: string;
+  // Added 2026-08-25 for the melt calculator's "Add to list" / "Get a firm
+  // offer on this list" controls -- purely additive, every existing call
+  // site passes neither prop and is unaffected.
+  onClick?: () => void;
+  disabled?: boolean;
 }) {
   const base =
     "font-display inline-flex items-center justify-center gap-2 rounded-sm border px-6 py-3 text-[14px] font-semibold tracking-[0.06em] uppercase transition-colors md:text-[15px]";
@@ -64,9 +71,15 @@ export function Btn({
       : dark
         ? "bg-transparent border-[var(--line-on-dark)] text-[var(--text-inverse)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
         : "bg-transparent border-[var(--line-strong)] text-[var(--text-strong)] hover:border-[var(--accent)] hover:text-[var(--accent-press)]";
-  if (href) return <a href={href} className={`${base} ${styles} ${className}`}>{children}</a>;
+  const disabledStyles = disabled ? "opacity-40 pointer-events-none" : "";
+  if (href) return <a href={href} className={`${base} ${styles} ${disabledStyles} ${className}`}>{children}</a>;
   return (
-    <button type={type ?? "button"} className={`${base} ${styles} ${className}`}>
+    <button
+      type={type ?? "button"}
+      onClick={onClick}
+      disabled={disabled}
+      className={`${base} ${styles} ${disabledStyles} ${className}`}
+    >
       {children}
     </button>
   );
