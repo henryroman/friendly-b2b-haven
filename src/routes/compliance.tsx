@@ -2,18 +2,16 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { Section, RuleGold, Overline, Btn, Chip } from "@/components/site/Section";
+import { pageMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/compliance")({
-  head: () => ({
-    meta: [
-      { title: "Compliance — Tess Van Ghert" },
-      { name: "description", content: "KYC, KYB, sanctions screening, documented source of goods, and LBMA-accredited settlement. The infrastructure that lets a finance team sell metal without taking on risk." },
-      { property: "og:title", content: "Compliance — Tess Van Ghert" },
-      { property: "og:description", content: "How we keep the audit trail clean: KYC, KYB, sanctions and PEP screening, chain of custody, LBMA settlement." },
-      { property: "og:url", content: "https://tvg.gold/compliance" },
-    ],
-    links: [{ rel: "canonical", href: "https://tvg.gold/compliance" }],
-  }),
+  head: () =>
+    pageMeta({
+      title: "Compliance — Tess Van Ghert",
+      description:
+        "KYC, KYB, sanctions screening, documented source of goods, and LBMA-accredited settlement. The infrastructure that lets a finance team sell metal without taking on risk.",
+      path: "/compliance",
+    }),
   component: CompliancePage,
 });
 

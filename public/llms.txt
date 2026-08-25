@@ -1,11 +1,13 @@
 # Tess Van Ghert
 
-> We buy precious metal from companies. Compliant acquisition, global settlement, LBMA benchmark pricing, and full audit trail since 2011.
+> A physical precious metals trading house. We buy gold, silver, and platinum group metals from corporations, governments, estates, and industrial operators, and settle at LBMA benchmark prices through a compliant, documented chain to accredited refiners.
 
-## Pages
+Compliant acquisition. Global settlement. No logistics risk for the seller. Family-owned, trading physical precious metal since 2011.
 
-- [Home](/): Introduction to Tess Van Ghert's precious metals trading services for corporates, treasury teams, insolvency practitioners, and industrial manufacturers.
-- [Compliance](/compliance): KYC, KYB, sanctions and PEP screening, documented source of goods, chain of custody, and LBMA-accredited settlement framework.
-- [AML Policy](/aml-policy): Anti-money-laundering and counter-terrorist financing policy summary: risk-based approach, CDD, record keeping, and governance.
-- [Insights](/insights): Practical notes from the desk on precious metals trading, compliance, and global settlement.
-- [Corporate Liquidation Guide](/guides/corporate-liquidation): A B2B guide to selling precious metals at scale — valuation, documented source of goods, logistics, and settlement for treasury and insolvency teams.
+## Core pages
+
+- [Home](https://tvg.gold/): what we buy, who we work with, how a sale works.
+- [Compliance](https://tvg.gold/compliance): KYC/KYB, sanctions and PEP screening, documented source of goods, chain of custody.
+- [AML Policy](https://tvg.gold/aml-policy): the anti-money-laundering framework we operate under.
+- [Corporate Liquidation Guide](https://tvg.gold/guides/corporate-liquidation): how to sell precious metals at scale — valuation, source of goods, logistics, settlement.
+- [Insights](https://tvg.gold/insights): all articles.

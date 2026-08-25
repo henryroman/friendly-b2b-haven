@@ -2,44 +2,73 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { Section, RuleGold, Overline, Btn, Chip } from "@/components/site/Section";
+import { ORG_NAME, SITE_URL, pageMeta } from "@/lib/seo";
+
+// Single source of truth for this guide's FAQ — feeds both the visible FAQ section further
+// down this file and the FAQPage JSON-LD in head() below, so the two can't drift apart.
+const faq = [
+  {
+    q: "How long does a corporate sale usually take?",
+    a: "From first enquiry to funds on account: typically two to four weeks for documented bullion, four to eight for mixed or industrial material that needs sampling and refining. The compliance work tends to dominate the timeline, not the metal movement.",
+  },
+  {
+    q: "Can we sell without disclosing the source?",
+    a: "Not with a compliant counterparty. A buyer that does not ask is not a buyer your audit committee will be comfortable with.",
+  },
+  {
+    q: "What if the metal is held abroad?",
+    a: "Cross-border sales are routine. The buyer handles import or export licensing, and the Incoterm sets where seller risk ends. Plan an extra few days for customs clearance.",
+  },
+  {
+    q: "Is there a minimum size?",
+    a: "For us, no formal minimum, but the compliance and logistics overhead means the economics work best from a few kilos of fine gold equivalent upwards.",
+  },
+];
 
 export const Route = createFileRoute("/guides/corporate-liquidation")({
-  head: () => ({
-    meta: [
-      { title: "How to Sell Precious Metals: Corporate Liquidation Guide — Tess Van Ghert" },
-      {
-        name: "description",
-        content:
-          "A practical B2B guide to selling precious metals at scale: valuation at LBMA benchmark, documented source of goods, chain of custody, AML/KYB, and settlement. Written for treasury teams and insolvency practitioners.",
-      },
-      { property: "og:title", content: "How to Sell Precious Metals: Corporate Liquidation Guide" },
-      {
-        property: "og:description",
-        content:
-          "Risk-mitigated, audit-trail-first guide to liquidating corporate precious metal holdings. For treasury, finance, and insolvency teams.",
-      },
-      { property: "og:url", content: "https://tvg.gold/guides/corporate-liquidation" },
-      { property: "og:type", content: "article" },
-    ],
-    links: [
-      { rel: "canonical", href: "https://tvg.gold/guides/corporate-liquidation" },
-    ],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "Article",
-          headline: "How to Sell Precious Metals: Corporate Liquidation Guide",
-          description:
-            "A practical B2B guide to selling precious metals at scale: valuation, documented source of goods, chain of custody, AML/KYB, and settlement.",
-          author: { "@type": "Organization", name: "Tess Van Ghert" },
-          publisher: { "@type": "Organization", name: "Tess Van Ghert" },
-          mainEntityOfPage: "https://tvg.gold/guides/corporate-liquidation",
-        }),
-      },
-    ],
-  }),
+  head: () => {
+    const path = "/guides/corporate-liquidation";
+    const base = pageMeta({
+      title: "How to Sell Precious Metals: Corporate Liquidation Guide",
+      description:
+        "A practical B2B guide to selling precious metals at scale: valuation at LBMA benchmark, documented source of goods, chain of custody, AML/KYB, and settlement. Written for treasury teams and insolvency practitioners.",
+      path,
+      ogType: "article",
+    });
+    return {
+      ...base,
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Article",
+            headline: "How to Sell Precious Metals: Corporate Liquidation Guide",
+            description:
+              "A practical B2B guide to selling precious metals at scale: valuation, documented source of goods, chain of custody, AML/KYB, and settlement.",
+            author: { "@type": "Organization", name: ORG_NAME },
+            publisher: { "@type": "Organization", name: ORG_NAME },
+            mainEntityOfPage: `${SITE_URL}${path}`,
+          }),
+        },
+        {
+          // Basic hygiene, not a citation lever (Google dropped FAQ rich results in May 2026)
+          // — see the SEO/AEO build log. Kept because it costs nothing and the visible section
+          // below is the part actually doing the AEO work.
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: faq.map((f) => ({
+              "@type": "Question",
+              name: f.q,
+              acceptedAnswer: { "@type": "Answer", text: f.a },
+            })),
+          }),
+        },
+      ],
+    };
+  },
   component: GuidePage,
 });
 
@@ -244,30 +273,12 @@ function GuidePage() {
               <h2 className="font-display text-[28px] sm:text-[32px] md:text-[36px]">FAQ</h2>
 
               <div className="mt-6 space-y-6">
-                <div>
-                  <h3 className="font-display text-[20px] md:text-[22px]">How long does a corporate sale usually take?</h3>
-                  <p className="text-muted-foreground mt-2 text-[17px] leading-[1.65] md:text-[18px]">
-                    From first enquiry to funds on account: typically two to four weeks for documented bullion, four to eight for mixed or industrial material that needs sampling and refining. The compliance work tends to dominate the timeline, not the metal movement.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-display text-[20px] md:text-[22px]">Can we sell without disclosing the source?</h3>
-                  <p className="text-muted-foreground mt-2 text-[17px] leading-[1.65] md:text-[18px]">
-                    Not with a compliant counterparty. A buyer that does not ask is not a buyer your audit committee will be comfortable with.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-display text-[20px] md:text-[22px]">What if the metal is held abroad?</h3>
-                  <p className="text-muted-foreground mt-2 text-[17px] leading-[1.65] md:text-[18px]">
-                    Cross-border sales are routine. The buyer handles import or export licensing, and the Incoterm sets where seller risk ends. Plan an extra few days for customs clearance.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-display text-[20px] md:text-[22px]">Is there a minimum size?</h3>
-                  <p className="text-muted-foreground mt-2 text-[17px] leading-[1.65] md:text-[18px]">
-                    For us, no formal minimum, but the compliance and logistics overhead means the economics work best from a few kilos of fine gold equivalent upwards.
-                  </p>
-                </div>
+                {faq.map((f) => (
+                  <div key={f.q}>
+                    <h3 className="font-display text-[20px] md:text-[22px]">{f.q}</h3>
+                    <p className="text-muted-foreground mt-2 text-[17px] leading-[1.65] md:text-[18px]">{f.a}</p>
+                  </div>
+                ))}
               </div>
             </section>
 

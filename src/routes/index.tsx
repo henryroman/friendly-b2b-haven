@@ -2,18 +2,16 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Nav } from "@/components/site/Nav";
 import { Footer } from "@/components/site/Footer";
 import { Section, RuleGold, Overline, Btn, Chip } from "@/components/site/Section";
+import { pageMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Tess Van Ghert — We buy precious metal from companies" },
-      { name: "description", content: "Compliant acquisition. Global settlement. We price at the LBMA benchmark, manage every step from collection to refining, and wire the funds." },
-      { property: "og:title", content: "Tess Van Ghert — Precious Metal Trading" },
-      { property: "og:description", content: "We buy precious metal from companies. Compliant · Global settlement · FCA/EXW." },
-      { property: "og:url", content: "https://tvg.gold/" },
-    ],
-    links: [{ rel: "canonical", href: "https://tvg.gold/" }],
-  }),
+  head: () =>
+    pageMeta({
+      title: "Tess Van Ghert — We buy precious metal from companies",
+      description:
+        "Compliant acquisition. Global settlement. We price at the LBMA benchmark, manage every step from collection to refining, and wire the funds.",
+      path: "/",
+    }),
   component: Index,
 });
 

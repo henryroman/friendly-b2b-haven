@@ -1,4 +1,34 @@
 User-agent: *
 Allow: /
 
+# AI answer engines, explicitly allow-listed. The wildcard rule above already permits these,
+# but AEO visibility is a deliberate goal here rather than an accident of a permissive
+# default, so it is stated outright and will survive any future tightening of the wildcard.
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
 Sitemap: https://tvg.gold/sitemap.xml
