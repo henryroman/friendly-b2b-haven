@@ -38,11 +38,12 @@ const submissionSchema = z.object({
 export type QualifySubmission = z.infer<typeof submissionSchema>;
 export type QualifySubmitResult = { ok: true } | { ok: false; error: "not_configured" | "send_failed" };
 
-// Sending address must be on a domain verified in the org's Resend
-// account before this will actually deliver -- Resend rejects sends from
-// an unverified domain. Using tvg.gold's own domain as the most likely
-// already-configured candidate; confirm/adjust once RESEND_API_KEY is set.
-const FROM_ADDRESS = "Sell Your Metal <noreply@tvg.gold>";
+// Sending domain confirmed already verified in Resend, not guessed --
+// tvg-hub's own wrangler.toml sets EMAIL_FROM=hub@verification.tessvanghert.com
+// for its own OTP login codes, so this reuses that same already-working
+// domain rather than tvg.gold's own (unverified; would need its own DNS
+// records added in Resend before any send from it could succeed).
+const FROM_ADDRESS = "Sell Your Metal <noreply@verification.tessvanghert.com>";
 const RECIPIENT = "info@tessvanghert.com";
 const FETCH_TIMEOUT_MS = 8000;
 
