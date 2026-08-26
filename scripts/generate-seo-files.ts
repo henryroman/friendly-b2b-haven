@@ -43,6 +43,7 @@ async function loadPosts(): Promise<InsightPost[]> {
 async function writeSitemap(posts: InsightPost[]) {
   const staticPages = [
     { loc: "/", changefreq: "weekly", priority: "1.0" },
+    { loc: "/sell-your-metal", changefreq: "monthly", priority: "0.9" },
     { loc: "/compliance", changefreq: "monthly", priority: "0.8" },
     { loc: "/aml-policy", changefreq: "monthly", priority: "0.8" },
     { loc: "/insights", changefreq: "weekly", priority: "0.7" },
@@ -85,6 +86,7 @@ async function writeLlmsTxt(posts: InsightPost[]) {
     "## Core pages",
     "",
     `- [Home](${SITE_URL}/): what we buy, who we work with, how a sale works.`,
+    `- [Sell Your Metal](${SITE_URL}/sell-your-metal): a short qualifying questionnaire that ends in a firm offer at the LBMA benchmark.`,
     `- [Compliance](${SITE_URL}/compliance): KYC/KYB, sanctions and PEP screening, documented source of goods, chain of custody.`,
     `- [AML Policy](${SITE_URL}/aml-policy): the anti-money-laundering framework we operate under.`,
     `- [Corporate Liquidation Guide](${SITE_URL}/guides/corporate-liquidation): how to sell precious metals at scale — valuation, source of goods, logistics, settlement.`,

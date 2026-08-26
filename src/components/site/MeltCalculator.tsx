@@ -8,7 +8,7 @@ import {
   type Currency,
   type PurityOption,
 } from "@/lib/melt-calculator-data";
-import type { LivePriceData } from "@/lib/metals-price";
+import type { LivePriceData } from "@/lib/metals-price.server";
 import { loadSavedLots, persistSavedLots, totalsByCurrency, newItemId, type SavedLotItem } from "@/lib/melt-list";
 
 // New (2026-08-25). No prior calculator existed on this site -- built
@@ -19,9 +19,8 @@ import { loadSavedLots, persistSavedLots, totalsByCurrency, newItemId, type Save
 // repo are unused by any TVG-specific component so far, so reaching for
 // shadcn Select here would be the odd one out, not the established
 // pattern). Live prices come from the homepage route's loader, which
-// fetches them server-side via src/lib/metals-price.ts (originally
-// metals-price.server.ts, renamed -- see that file's comment for why).
-// See that file's comment for the CORS reasoning on why this can't be a
+// fetches them server-side via src/lib/metals-price.server.ts -- see that
+// file's comment for the CORS reasoning on why this can't be a
 // client-side fetch.
 //
 // "Add to list" (same day, second pass) -- a visitor pricing several
@@ -200,7 +199,7 @@ export function MeltCalculator({ livePrices }: { livePrices: LivePriceData }) {
             <Btn variant="secondary" onClick={addToList} disabled={value === null}>
               Add to list
             </Btn>
-            <Btn variant="primary" href={`?metal=${encodeURIComponent(purity.formValue)}#enquire`}>
+            <Btn variant="primary" href={`/sell-your-metal?metal=${encodeURIComponent(purity.formValue)}`}>
               Get a firm offer
             </Btn>
           </div>
@@ -265,7 +264,7 @@ export function MeltCalculator({ livePrices }: { livePrices: LivePriceData }) {
             </div>
             <Btn
               variant="primary"
-              href={`?metal=${encodeURIComponent(listMetalParam)}&note=${encodeURIComponent(listNote)}#enquire`}
+              href={`/sell-your-metal?metal=${encodeURIComponent(listMetalParam)}&note=${encodeURIComponent(listNote)}`}
             >
               Get a firm offer on this list
             </Btn>
