@@ -76,7 +76,7 @@ function Index() {
               Compliant acquisition. Global settlement. No logistics risk for the seller. We price at the LBMA benchmark, manage every step from collection to refining, and wire the funds.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Btn href="#enquire" variant="primary">Make an enquiry</Btn>
+              <Btn href="/sell-your-metal" variant="primary">Make an enquiry</Btn>
               <Btn href="#book-a-call" variant="secondary" dark>Book a call</Btn>
             </div>
             <div className="mt-10 flex flex-wrap gap-3">

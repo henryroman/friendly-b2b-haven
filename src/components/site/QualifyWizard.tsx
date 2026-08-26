@@ -1,168 +1,138 @@
 import { useMemo, useState, type FormEvent } from "react";
-import { Overline, Btn } from "./Section";
+import { Btn, Overline } from "./Section";
 import {
-  SEGMENTS,
-  VALUE_QUESTION,
-  TIMELINE_QUESTION,
-  segmentByKey,
-  type SegmentKey,
-  type ChoiceQuestion,
+  AUDIENCE_OPTIONS,
+  INTENT_OPTIONS,
+  identifyOptionsFor,
+  type Audience,
+  type Intent,
 } from "@/lib/qualify-data";
-import { submitQualifyForm, type QualifySubmission } from "@/lib/qualify-submit";
+import { submitQualifyForm } from "@/lib/qualify-submit";
 
-// Multi-step, multiple-choice self-qualifying form for /sell-your-metal.
-// Replaces routing the calculator's "Get a firm offer" straight into the
-// general enquiry form -- H asked for something stronger: a real
-// qualifying flow, branched by which of TVG's five ideal-customer types
-// (see qualify-data.ts) the visitor actually is, ending in a single email
-// to the desk rather than a bare contact form. No CRM write, no account,
-// no new backend beyond the one server function (qualify-submit.ts).
+// Rebuilt 2026-08-26 per H's direct redesign request. Was a 6-segment
+// picker with 2-3 tailored follow-up questions per segment, a value-range
+// question, a timeline question, and a 6-field contact form (name,
+// company, email, phone, location, notes). Now four short steps --
+// individual/company, sell/buy, self-identify, email -- deliberately
+// trading away the richer segment-specific questions and the value/
+// timeline qualifiers for speed. "lets make it easy" was explicit in the
+// request; friction was cut everywhere, not just the contact step.
 
-type Phase = "segment" | "questions" | "value" | "timeline" | "contact" | "submitting" | "done" | "error";
+type Phase = "audience" | "intent" | "identify" | "email" | "submitting" | "done" | "error";
 
-const inputCls =
-  "w-full rounded-sm border border-[var(--line-hairline)] bg-[var(--surface-page)] px-4 py-3 text-[15px] text-[var(--text-body)] outline-none transition-colors focus:border-[var(--accent)]";
-const labelCls =
-  "font-display block text-[12px] uppercase tracking-[var(--tracking-overline)] text-[var(--text-muted)] mb-2";
+const STEP_ORDER: Phase[] = ["audience", "intent", "identify", "email"];
 
 export function QualifyWizard({
-  initialMetal = "",
-  initialNote = "",
+  initialMetal,
+  initialNote,
 }: {
   initialMetal?: string;
   initialNote?: string;
 }) {
-  const [phase, setPhase] = useState<Phase>("segment");
-  const [segment, setSegment] = useState<SegmentKey | null>(null);
-  const [questionIndex, setQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [value, setValue] = useState("");
-  const [timeline, setTimeline] = useState("");
-  const [contact, setContact] = useState({ name: "", company: "", email: "", phone: "", location: "", notes: "" });
+  const [phase, setPhase] = useState<Phase>("audience");
+  const [audience, setAudience] = useState<Audience | null>(null);
+  const [intent, setIntent] = useState<Intent | null>(null);
+  const [identify, setIdentify] = useState<string | null>(null);
+  const [email, setEmail] = useState("");
   const [honeypot, setHoneypot] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
 
-  const segmentData = segment ? segmentByKey(segment) : null;
+  const identifyOptions = useMemo(() => (audience ? identifyOptionsFor(audience) : []), [audience]);
+  const audienceLabel = AUDIENCE_OPTIONS.find((a) => a.key === audience)?.label ?? "";
+  const intentLabel = INTENT_OPTIONS.find((i) => i.key === intent)?.label ?? "";
+  const identifyLabel = identifyOptions.find((o) => o.key === identify)?.label ?? "";
 
-  // A visitor arriving from the calculator (either the single "Get a firm
-  // offer" button or the saved-lots list one) already gave us useful
-  // context -- surfaced as a small banner rather than re-asked, and folded
-  // into the email so the desk sees exactly what the visitor was looking
-  // at when they clicked through.
+  // ?metal=/?note= carried through from the calculator's own CTA, same
+  // mechanism as the original build -- shown as context, folded into the
+  // emailed startedFrom field, never mapped onto a specific answer.
   const startedFrom = useMemo(() => {
-    if (initialNote) return initialNote;
-    if (initialMetal) return `Started from the melt calculator — ${initialMetal}.`;
+    if (initialNote) return `From the melt calculator: ${initialNote}`;
+    if (initialMetal) return `From the melt calculator — metal: ${initialMetal}`;
     return "";
   }, [initialMetal, initialNote]);
 
-  const totalSteps = (segmentData ? segmentData.questions.length : 1) + 4;
-
-  function currentStepNumber(): number {
-    if (phase === "segment") return 1;
-    if (!segmentData) return 1;
-    if (phase === "questions") return 2 + questionIndex;
-    if (phase === "value") return 2 + segmentData.questions.length;
-    if (phase === "timeline") return 3 + segmentData.questions.length;
-    return 4 + segmentData.questions.length;
-  }
-
-  function pickSegment(key: SegmentKey) {
-    setSegment(key);
-    setQuestionIndex(0);
-    setAnswers({});
-    setPhase("questions");
-  }
-
-  function answerQuestion(q: ChoiceQuestion, option: string) {
-    setAnswers((a) => ({ ...a, [q.id]: option }));
-    if (segmentData && questionIndex < segmentData.questions.length - 1) {
-      setQuestionIndex((i) => i + 1);
-    } else {
-      setPhase("value");
-    }
-  }
+  const stepIndex = Math.max(STEP_ORDER.indexOf(phase), 0);
+  const totalSteps = STEP_ORDER.length;
+  const showChrome = phase !== "done";
+  const canGoBack = stepIndex > 0 && phase !== "submitting" && phase !== "error";
 
   function goBack() {
-    if (phase === "questions") {
-      if (questionIndex > 0) {
-        setQuestionIndex((i) => i - 1);
-      } else {
-        setPhase("segment");
-      }
-      return;
-    }
-    if (phase === "value") {
-      if (segmentData && segmentData.questions.length > 0) {
-        setQuestionIndex(segmentData.questions.length - 1);
-        setPhase("questions");
-      } else {
-        setPhase("segment");
-      }
-      return;
-    }
-    if (phase === "timeline") {
-      setPhase("value");
-      return;
-    }
-    if (phase === "contact" || phase === "error") {
-      setPhase("timeline");
-      return;
-    }
+    if (phase === "intent") setPhase("audience");
+    else if (phase === "identify") setPhase("intent");
+    else if (phase === "email" || phase === "error") setPhase("identify");
   }
+
+  function pickAudience(key: Audience) {
+    setAudience(key);
+    setIdentify(null);
+    setPhase("intent");
+  }
+
+  function pickIntent(key: Intent) {
+    setIntent(key);
+    setPhase("identify");
+  }
+
+  function pickIdentify(key: string) {
+    setIdentify(key);
+    setPhase("email");
+  }
+
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!contact.name.trim() || !contact.email.trim() || !segmentData) return;
+    if (!audience || !intent || !identify || !emailValid) return;
     setPhase("submitting");
-
-    const payload: QualifySubmission = {
-      segment: segmentData.key,
-      segmentLabel: segmentData.label,
-      answers: segmentData.questions.map((q) => ({ question: q.question, answer: answers[q.id] ?? "" })),
-      value,
-      timeline,
-      name: contact.name,
-      company: contact.company,
-      email: contact.email,
-      phone: contact.phone,
-      location: contact.location,
-      notes: contact.notes,
-      startedFrom,
-      honeypot,
-    };
-
+    setErrorMsg("");
     try {
-      const result = await submitQualifyForm({ data: payload });
-      setPhase(result.ok ? "done" : "error");
+      const result = await submitQualifyForm({
+        data: {
+          audience,
+          audienceLabel,
+          intent,
+          intentLabel,
+          identify,
+          identifyLabel,
+          email: email.trim(),
+          startedFrom,
+          honeypot,
+        },
+      });
+      if (result.ok) {
+        setPhase("done");
+      } else {
+        setErrorMsg(
+          result.error === "not_configured"
+            ? "Email delivery isn't fully set up yet."
+            : "Something went wrong sending this.",
+        );
+        setPhase("error");
+      }
     } catch {
+      setErrorMsg("Something went wrong sending this.");
       setPhase("error");
     }
   }
 
   function mailtoFallback(): string {
-    if (!segmentData) return "mailto:info@tessvanghert.com";
-    const lines = [
-      `Segment: ${segmentData.label}`,
-      ...segmentData.questions.map((q) => `${q.question} ${answers[q.id] ?? "—"}`),
-      `Value range: ${value || "—"}`,
-      `Timeline: ${timeline || "—"}`,
-      `Company: ${contact.company || "—"}`,
-      `Location: ${contact.location || "—"}`,
-      "",
-      contact.notes || "",
-    ].join("\n");
-    const subject = `Sell your metal — ${segmentData.label} — ${contact.company || contact.name}`;
-    return `mailto:info@tessvanghert.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines)}`;
+    const lines = [`I am: ${audienceLabel}`, `Looking to: ${intentLabel}`, `About: ${identifyLabel}`, startedFrom].filter(
+      Boolean,
+    );
+    const body = encodeURIComponent(lines.join("\n"));
+    const subject = encodeURIComponent(`Enquiry — ${identifyLabel}`);
+    return `mailto:info@tessvanghert.com?subject=${subject}&body=${body}`;
   }
 
   return (
-    <div>
-      {phase !== "done" && (
+    <div className="mx-auto max-w-[640px]">
+      {showChrome && (
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <Overline>
-              Step {currentStepNumber()} of {totalSteps}
+              Step {Math.min(stepIndex + 1, totalSteps)} of {totalSteps}
             </Overline>
-            {phase !== "segment" && (
+            {canGoBack && (
               <button
                 type="button"
                 onClick={goBack}
@@ -172,133 +142,88 @@ export function QualifyWizard({
               </button>
             )}
           </div>
-          <div className="mt-3 h-[3px] w-full bg-[var(--line-hairline)]">
+          <div className="mt-3 h-1 w-full bg-[var(--line-hairline)]">
             <div
-              className="h-full bg-[var(--accent)] transition-all"
-              style={{ width: `${Math.min(100, (currentStepNumber() / totalSteps) * 100)}%` }}
+              className="h-1 bg-[var(--accent)] transition-all"
+              style={{ width: `${(Math.min(stepIndex + 1, totalSteps) / totalSteps) * 100}%` }}
             />
           </div>
         </div>
       )}
 
-      {startedFrom && phase === "segment" && (
-        <p className="mb-6 border-l-2 border-[var(--accent)] pl-4 text-[14.5px] leading-[1.6] text-[var(--text-muted)]">
+      {startedFrom && phase === "audience" && (
+        <p className="mb-6 border border-[var(--line-hairline)] bg-[var(--surface-card)] p-4 text-[14px] text-[var(--text-muted)]">
           {startedFrom}
         </p>
       )}
 
-      {phase === "segment" && (
-        <div>
-          <h2 className="font-display text-[26px] sm:text-[28px]">Which of these best describes you?</h2>
-          <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {SEGMENTS.map((s) => (
-              <ChoiceCard key={s.key} label={s.label} description={s.description} onClick={() => pickSegment(s.key)} />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {phase === "questions" && segmentData && (
-        <QuestionStep question={segmentData.questions[questionIndex]} onAnswer={(opt) => answerQuestion(segmentData.questions[questionIndex], opt)} />
-      )}
-
-      {phase === "value" && (
-        <QuestionStep
-          question={VALUE_QUESTION}
-          onAnswer={(opt) => {
-            setValue(opt);
-            setPhase("timeline");
-          }}
+      {phase === "audience" && (
+        <StepChoices
+          title="Are you an individual or a company?"
+          options={AUDIENCE_OPTIONS}
+          onPick={(key) => pickAudience(key as Audience)}
         />
       )}
 
-      {phase === "timeline" && (
-        <QuestionStep
-          question={TIMELINE_QUESTION}
-          onAnswer={(opt) => {
-            setTimeline(opt);
-            setPhase("contact");
-          }}
+      {phase === "intent" && (
+        <StepChoices
+          title="Are you looking to sell or buy metal?"
+          options={INTENT_OPTIONS}
+          onPick={(key) => pickIntent(key as Intent)}
         />
       )}
 
-      {(phase === "contact" || phase === "submitting" || phase === "error") && (
-        <div>
-          <h2 className="font-display text-[26px] sm:text-[28px]">Last step — how should we reach you?</h2>
-          <form onSubmit={handleSubmit} className="mt-6 grid grid-cols-1 gap-5">
-            {/* Honeypot -- visually hidden, real visitors never see or fill this */}
-            <div style={{ position: "absolute", left: "-9999px", width: 1, height: 1, overflow: "hidden" }} aria-hidden="true">
-              <label htmlFor="qw-website">Leave this field empty</label>
-              <input
-                id="qw-website"
-                type="text"
-                tabIndex={-1}
-                autoComplete="off"
-                value={honeypot}
-                onChange={(e) => setHoneypot(e.target.value)}
-              />
-            </div>
+      {phase === "identify" && (
+        <StepChoices title="Which of these fits best?" options={identifyOptions} onPick={pickIdentify} />
+      )}
 
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-              <div>
-                <label className={labelCls} htmlFor="qw-name">Full name</label>
-                <input id="qw-name" required type="text" className={inputCls} value={contact.name} onChange={(e) => setContact((c) => ({ ...c, name: e.target.value }))} />
-              </div>
-              <div>
-                <label className={labelCls} htmlFor="qw-company">Company</label>
-                <input id="qw-company" type="text" className={inputCls} value={contact.company} onChange={(e) => setContact((c) => ({ ...c, company: e.target.value }))} />
-              </div>
-            </div>
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-              <div>
-                <label className={labelCls} htmlFor="qw-email">Email</label>
-                <input id="qw-email" required type="email" className={inputCls} value={contact.email} onChange={(e) => setContact((c) => ({ ...c, email: e.target.value }))} />
-              </div>
-              <div>
-                <label className={labelCls} htmlFor="qw-phone">Phone</label>
-                <input id="qw-phone" type="tel" className={inputCls} value={contact.phone} onChange={(e) => setContact((c) => ({ ...c, phone: e.target.value }))} />
-              </div>
-            </div>
-            <div>
-              <label className={labelCls} htmlFor="qw-location">Location of the metal</label>
-              <input id="qw-location" type="text" placeholder="City, country" className={inputCls} value={contact.location} onChange={(e) => setContact((c) => ({ ...c, location: e.target.value }))} />
-            </div>
-            <div>
-              <label className={labelCls} htmlFor="qw-notes">Anything else</label>
-              <textarea id="qw-notes" rows={4} className={inputCls} value={contact.notes} onChange={(e) => setContact((c) => ({ ...c, notes: e.target.value }))} />
-            </div>
-
-            {phase === "error" && (
-              <div className="border-l-2 border-[var(--accent)] pl-4">
-                <p className="text-[14.5px] leading-[1.6] text-[var(--text-body)]">
-                  Something went wrong sending this through automatically. Please email us directly and we&apos;ll pick it up from there —
-                  {" "}
-                  <a href={mailtoFallback()} className="text-[var(--accent-press)] underline">
-                    email info@tessvanghert.com
-                  </a>
-                  , or try again below.
-                </p>
-              </div>
-            )}
-
-            <Btn type="submit" variant="primary" className="self-start" disabled={phase === "submitting"}>
-              {phase === "submitting" ? "Sending…" : "Get my firm offer"}
-            </Btn>
-            <p className="text-[12.5px] text-[var(--text-muted)]">
-              Submitting does not create a contract. All enquiries handled in confidence.
+      {(phase === "email" || phase === "submitting" || phase === "error") && (
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          <h2 className="font-display text-[26px] sm:text-[30px]">Last step — your email</h2>
+          <p className="text-[15px] text-[var(--text-muted)]">
+            {audienceLabel} · {intentLabel} · {identifyLabel}
+          </p>
+          {/* Honeypot -- real visitors never see this field. */}
+          <input
+            type="text"
+            value={honeypot}
+            onChange={(e) => setHoneypot(e.target.value)}
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+            style={{ position: "absolute", left: -9999, width: 1, height: 1, opacity: 0 }}
+          />
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@company.com"
+            required
+            className="w-full rounded-sm border border-[var(--line-hairline)] bg-[var(--surface-page)] px-4 py-3 text-[17px] text-[var(--text-body)] outline-none transition-colors focus:border-[var(--accent)]"
+          />
+          <Btn type="submit" variant="primary" disabled={!emailValid || phase === "submitting"}>
+            {phase === "submitting" ? "Sending…" : "Get my firm offer"}
+          </Btn>
+          {phase === "error" && (
+            <p className="text-[14px] text-[var(--text-muted)]">
+              {errorMsg}{" "}
+              <a href={mailtoFallback()} className="text-[var(--accent-press)] underline">
+                Email us directly instead
+              </a>
+              .
             </p>
-          </form>
-        </div>
+          )}
+          <p className="text-[12.5px] text-[var(--text-muted)]">
+            Submitting does not create a contract. All enquiries handled in confidence.
+          </p>
+        </form>
       )}
 
       {phase === "done" && (
-        <div
-          className="border-t-2 border-[var(--accent)] bg-[var(--surface-card)] p-8 text-center shadow-sm md:p-12"
-          style={{ border: "1px solid var(--line-hairline)", borderTopWidth: "2px", borderTopColor: "var(--accent)" }}
-        >
-          <Overline>Confirmation</Overline>
-          <p className="font-display mt-4 text-[22px] text-[var(--text-strong)] md:text-[26px]">
-            Request received. We come back with an indicative valuation, usually within one working day.
+        <div className="border border-[var(--line-hairline)] bg-[var(--surface-card)] p-8 text-center">
+          <Overline>Request received</Overline>
+          <p className="mt-4 text-[18px] text-[var(--text-body)]">
+            We'll come back to you with an indicative offer, usually the same working day.
           </p>
         </div>
       )}
@@ -306,28 +231,30 @@ export function QualifyWizard({
   );
 }
 
-function QuestionStep({ question, onAnswer }: { question: ChoiceQuestion; onAnswer: (option: string) => void }) {
+function StepChoices({
+  title,
+  options,
+  onPick,
+}: {
+  title: string;
+  options: { key: string; label: string }[];
+  onPick: (key: string) => void;
+}) {
   return (
     <div>
-      <h2 className="font-display text-[26px] sm:text-[28px]">{question.question}</h2>
+      <h2 className="font-display text-[26px] sm:text-[30px]">{title}</h2>
       <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {question.options.map((opt) => (
-          <ChoiceCard key={opt} label={opt} onClick={() => onAnswer(opt)} />
+        {options.map((o) => (
+          <button
+            key={o.key}
+            type="button"
+            onClick={() => onPick(o.key)}
+            className="border border-[var(--line-hairline)] bg-[var(--surface-card)] p-5 text-left text-[16px] text-[var(--text-body)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent-press)]"
+          >
+            {o.label}
+          </button>
         ))}
       </div>
     </div>
-  );
-}
-
-function ChoiceCard({ label, description, onClick }: { label: string; description?: string; onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="w-full rounded-sm border border-[var(--line-hairline)] bg-[var(--surface-card)] px-5 py-4 text-left shadow-sm transition-colors hover:border-[var(--accent)]"
-    >
-      <span className="font-display block text-[16px] text-[var(--text-strong)]">{label}</span>
-      {description && <span className="mt-1 block text-[14px] leading-[1.5] text-[var(--text-muted)]">{description}</span>}
-    </button>
   );
 }

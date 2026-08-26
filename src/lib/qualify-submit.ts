@@ -8,6 +8,11 @@ import { z } from "zod";
 // tvg-hub changes). Same provider tvg-hub already uses for its own OTP
 // login codes, so this doesn't introduce a new vendor to the account.
 //
+// Rebuilt 2026-08-26 alongside QualifyWizard.tsx's redesign -- schema
+// trimmed to match the new four-step flow (audience/intent/identify/email),
+// dropping the old per-segment answers[], value, timeline, and the
+// name/company/phone/location/notes contact fields.
+//
 // NOTE on filename: this is a createServerFn same as metals-price.ts, and
 // deliberately does NOT use a ".server.ts" filename -- TanStack Start's
 // import-protection Vite plugin bans importing any **/*.server.* file into
@@ -17,17 +22,13 @@ import { z } from "zod";
 // actually enforces server-only execution at runtime, not the filename.
 
 const submissionSchema = z.object({
-  segment: z.string().min(1),
-  segmentLabel: z.string().min(1),
-  answers: z.array(z.object({ question: z.string(), answer: z.string() })),
-  value: z.string(),
-  timeline: z.string(),
-  name: z.string().min(1),
-  company: z.string(),
+  audience: z.enum(["individual", "company"]),
+  audienceLabel: z.string().min(1),
+  intent: z.enum(["sell", "buy"]),
+  intentLabel: z.string().min(1),
+  identify: z.string().min(1),
+  identifyLabel: z.string().min(1),
   email: z.string().email(),
-  phone: z.string(),
-  location: z.string(),
-  notes: z.string(),
   startedFrom: z.string(),
   // Honeypot -- a real visitor never sees or fills this field (visually
   // hidden in QualifyWizard.tsx). Non-empty almost certainly means a bot.
@@ -54,31 +55,18 @@ function escapeHtml(s: string): string {
 }
 
 function buildEmailHtml(data: QualifySubmission): string {
-  const answerRows = data.answers
-    .map(
-      (a) =>
-        `<tr><td style="padding:5px 16px 5px 0;color:#666;vertical-align:top;">${escapeHtml(a.question)}</td><td style="padding:5px 0;font-weight:600;">${escapeHtml(a.answer)}</td></tr>`,
-    )
-    .join("");
-
+  const kind = data.intent === "buy" ? "buyer" : "seller";
   return `
     <div style="font-family:Georgia,'Times New Roman',serif;max-width:600px;color:#111218;">
-      <p style="text-transform:uppercase;letter-spacing:0.08em;font-size:12px;color:#c49a5c;margin:0 0 6px;">New qualified lead</p>
-      <h2 style="margin:0 0 4px;font-size:22px;">${escapeHtml(data.segmentLabel)}</h2>
+      <p style="text-transform:uppercase;letter-spacing:0.08em;font-size:12px;color:#c49a5c;margin:0 0 6px;">New ${kind} lead</p>
+      <h2 style="margin:0 0 4px;font-size:22px;">${escapeHtml(data.identifyLabel)}</h2>
       <p style="color:#666;margin:0 0 20px;font-size:13px;">via Sell Your Metal — tvg.gold</p>
       <table style="border-collapse:collapse;width:100%;margin-bottom:16px;">
-        <tr><td style="padding:5px 16px 5px 0;color:#666;">Value range</td><td style="padding:5px 0;font-weight:600;">${escapeHtml(data.value)}</td></tr>
-        <tr><td style="padding:5px 16px 5px 0;color:#666;">Timeline</td><td style="padding:5px 0;font-weight:600;">${escapeHtml(data.timeline)}</td></tr>
-        ${answerRows}
+        <tr><td style="padding:5px 16px 5px 0;color:#666;">Who</td><td style="padding:5px 0;font-weight:600;">${escapeHtml(data.audienceLabel)}</td></tr>
+        <tr><td style="padding:5px 16px 5px 0;color:#666;">Looking to</td><td style="padding:5px 0;font-weight:600;">${escapeHtml(data.intentLabel)}</td></tr>
+        <tr><td style="padding:5px 16px 5px 0;color:#666;">About</td><td style="padding:5px 0;font-weight:600;">${escapeHtml(data.identifyLabel)}</td></tr>
+        <tr><td style="padding:5px 16px 5px 0;color:#666;">Email</td><td style="padding:5px 0;font-weight:600;"><a href="mailto:${escapeHtml(data.email)}">${escapeHtml(data.email)}</a></td></tr>
       </table>
-      <table style="border-collapse:collapse;width:100%;border-top:1px solid #ddd;padding-top:8px;">
-        <tr><td style="padding:5px 16px 5px 0;color:#666;">Name</td><td style="padding:5px 0;">${escapeHtml(data.name)}</td></tr>
-        <tr><td style="padding:5px 16px 5px 0;color:#666;">Company</td><td style="padding:5px 0;">${escapeHtml(data.company || "—")}</td></tr>
-        <tr><td style="padding:5px 16px 5px 0;color:#666;">Email</td><td style="padding:5px 0;">${escapeHtml(data.email)}</td></tr>
-        <tr><td style="padding:5px 16px 5px 0;color:#666;">Phone</td><td style="padding:5px 0;">${escapeHtml(data.phone || "—")}</td></tr>
-        <tr><td style="padding:5px 16px 5px 0;color:#666;">Location</td><td style="padding:5px 0;">${escapeHtml(data.location || "—")}</td></tr>
-      </table>
-      ${data.notes ? `<p style="margin-top:16px;"><strong>Notes:</strong> ${escapeHtml(data.notes)}</p>` : ""}
       ${data.startedFrom ? `<p style="margin-top:16px;color:#666;font-size:13px;">${escapeHtml(data.startedFrom)}</p>` : ""}
     </div>
   `;
@@ -109,7 +97,7 @@ export const submitQualifyForm = createServerFn({ method: "POST" })
           from: FROM_ADDRESS,
           to: [RECIPIENT],
           reply_to: data.email,
-          subject: `New qualified lead — ${data.segmentLabel} — ${data.company || data.name}`,
+          subject: `New ${data.intent === "buy" ? "buyer" : "seller"} lead — ${data.identifyLabel} (${data.audienceLabel})`,
           html: buildEmailHtml(data),
         }),
         signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
