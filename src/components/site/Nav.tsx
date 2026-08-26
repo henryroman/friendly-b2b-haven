@@ -4,6 +4,7 @@ import iconmark from "@/assets/iconMarkReversed.png";
 
 const links = [
   { to: "/", label: "Home" },
+  { to: "/calculator", label: "Calculator" },
   { to: "/compliance", label: "Compliance" },
   { to: "/aml-policy", label: "AML Policy" },
   { to: "/insights", label: "Insights" },
@@ -40,8 +41,7 @@ export function Nav() {
 
         <div className="flex items-center gap-3 md:gap-5">
           <Link
-            to="/"
-            hash="enquire"
+            to="/sell-your-metal"
             className="font-display hidden items-center justify-center rounded-sm border border-[var(--accent)] bg-[var(--accent)] px-5 py-2.5 text-[14px] font-semibold tracking-[0.06em] uppercase text-[var(--text-on-gold)] transition-colors hover:bg-[var(--accent-hover)] sm:inline-flex"
           >
             Make an enquiry
@@ -74,8 +74,7 @@ export function Nav() {
             ))}
             <li className="pt-4 pb-3">
               <Link
-                to="/"
-                hash="enquire"
+                to="/sell-your-metal"
                 onClick={() => setOpen(false)}
                 className="font-display inline-flex w-full items-center justify-center rounded-sm border border-[var(--accent)] bg-[var(--accent)] px-5 py-3 text-[14px] font-semibold tracking-[0.06em] uppercase text-[var(--text-on-gold)] sm:hidden"
               >
